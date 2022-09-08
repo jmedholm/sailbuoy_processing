@@ -206,7 +206,7 @@ def fix_dcps(ds):
         ds[old_name[i]].attrs['standard_name'] = standard_name[i]
         ds[old_name[i]].attrs['long_name'] = long_name[i]
         ds[old_name[i]].attrs['units'] = units[i]
-        ds[old_name[i]].attrs['installed_date'] = '2020'
+        ds[old_name[i]].attrs['installed_date'] = '2020-01'
         ds[old_name[i]].attrs['device_name'] = 'DCPS 5400'
         ds[old_name[i]].attrs['serial_number'] = '472'
         ds[old_name[i]].attrs['last_calibrated'] = ''
