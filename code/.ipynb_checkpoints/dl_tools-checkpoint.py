@@ -4,15 +4,6 @@ import datetime
 from tqdm.notebook import tqdm_notebook as tqdm
 import gsw
 
-#########################################################
-# ----------------------------------------------------- #
-# --------------------- Sailbuoy  --------------------- #
-# ----------------------------------------------------- #
-#           Author: Johan M. Edholm (2021)              #
-# ----------------------------------------------------- #
-# ----------------------------------------------------- #
-#########################################################
-
 """
 Module to load and work with SailBuoy data.
 """
@@ -26,7 +17,7 @@ def load_data(path):
     
     Walks through each line of the data.txt, dropping lines when the sensor is turning on.
     
-    Written by Johan Edholm 2022-09-08 (https://github.com/jmedholm)  
+    Written by Callum Rollo and Johan Edholm 2022-09-08  
     
     """
 
@@ -40,6 +31,7 @@ def load_data(path):
     good_samples = 0
     bad_samples = 0
     good_idx = []
+    
     for i, msg in enumerate(tqdm(data[0],'Checking lines in input file')):
             if ("Power on" in msg):
                 bad_samples += 1
@@ -141,8 +133,8 @@ def fix_airmar(ds):
 
     units = ['degrees_c',
              'degree',
-             'm s-1',
-             'm s-1',
+             'm s$^{-1}$',
+             'm s$^{-1}$',
              'degree',
              'integer']
 
@@ -200,7 +192,7 @@ def fix_dcps(ds):
 
     units = ['bitvector',
              'minutes',
-             'm s-1',
+             'm s$^{-1}$',
              'degree']
 
     long_name = ['Status flags',
@@ -248,7 +240,7 @@ def fix_aadi(ds):
     standard_name = ['sea_water_electrical_conductivity',
                      'sea_water_temperature']
 
-    units = ['mS cm-1',
+    units = ['mS cm$^{-1}$',
              'degrees_c']
 
     long_name = ['Seawater conductivity',
