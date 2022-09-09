@@ -290,8 +290,8 @@ def add_attrs(ds):
                       'cell_state2',
                       'horizontal_speed',
                       'direction',
-                      'north_speed',
-                      'east_speed',
+                      'northward_sea_water_velocity',
+                      'eastward_sea_water_velocity',
                       'vertical_speed',
                       'sp_sd_horizontal',
                       'strength',
@@ -386,7 +386,7 @@ def add_attrs(ds):
              'cm s$^{-1}$',
              'cm s$^{-1}$',
              'cm s$^{-1}$',
-             'strength',
+             'dB',
              'cm s$^{-1}$',
              'cm s$^{-1}$',
              'cm s$^{-1}$',
@@ -510,7 +510,7 @@ def add_attrs(ds):
         if 'time' not in var: # It didn't like setting units to a time variable
             ds[var].attrs['units'] = units[c]
         ds[var].attrs['description'] = description[c]
-        ds = ds.rename({var:standard_names[c]})
+        ds = ds.rename({var:variable_names[c]})
         c += 1        
     print(f"Updated names, units, and description for {len(long_names)} variables")
     
@@ -661,20 +661,23 @@ def update_attrs(ds):
             'c_u_mag',
             'c_v_mag',
             'c_u_corr',
-            'c_v_corr',]
+            'c_v_corr',
+            'horizontal_speed']
 
-    standard_names = ['sample_heading',
-                      'sample_time',
-                      'sample_vel',
-                      'sample_u',
-                      'sample_v',
-                      'c_u_mag',
-                      'c_v_mag',
-                      'c_u_corr',
-                      'c_v_corr',]
+    standard_names = ['',
+                      '',
+                      '',
+                      '',
+                      '',
+                      'eastward_sea_water_velocity',
+                      'northward_sea_water_velocity',
+                      'eastward_sea_water_velocity',
+                      'northward_sea_water_velocity',
+                      'horizontal_sea_water_velocity']
 
     unit = ['degrees',
             '',
+            'm s$^{-1}$',
             'm s$^{-1}$',
             'm s$^{-1}$',
             'm s$^{-1}$',
@@ -691,7 +694,8 @@ def update_attrs(ds):
             'East speed magneticly declinated',
             'North speed magneticly declinated',
             'East speed corrected',
-            'North speed corrected',]
+            'North speed corrected',
+            'Horizontal speed corrected']
 
     desc = ['Heading of the Sailbuoy during the sample',
             'Time taken to complete the sample',
@@ -701,10 +705,12 @@ def update_attrs(ds):
             'East speed corrected for magnetic declination',
             'North speed corrected for magnetic declination',
             'East speed corrected for magnetic declination and GPS movement',
-            'North speed corrected for magnetic declination and GPS movement',]
+            'North speed corrected for magnetic declination and GPS movement',
+            'Horizontal speed corrected for magnetic declination and GPS movement',]
     c = 0
     for var in keys:
-        ds[var].attrs['standard_name'] = keys[c]
+        if standard_names[c] != '':
+            ds[var].attrs['standard_name'] = standard_names[c]
         ds[var].attrs['long_name'] = long[c]
         if 'time' not in var: # It didn't like setting units to a time variable
             ds[var].attrs['units'] = unit[c]

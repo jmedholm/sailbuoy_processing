@@ -15,7 +15,7 @@ def heading_dist(ds,lr,left,right,path):
         bins = np.linspace(-lr,lr,200)
         _ = ax[i].hist(ds.where((ds['sample_heading'] > 315) | (ds['sample_heading'] < 45))[var[i]].values.flatten(), bins = bins, alpha=0.3, fc='b', edgecolor=None,label='North')
         _ = ax[i].hist(ds.where((ds['sample_heading'] > 225) & (ds['sample_heading'] < 315))[var[i]].values.flatten(), bins = bins, alpha=0.3, fc='r', edgecolor=None,label='West')
-        _ = ax[i].hist(ds.where((ds['sample_heading'] > 135) & (ds['sample_heading'] < 225))[var[i]].values.flatten(), bins = bins, alpha=0.3, fc='g', edgecolor=None,label='South')
+        _ = ax[i].hist(ds.where((ds['sample_heading'] > 135) & (ds['sample_heading'] < 225))[var[i]].values.flatten(), bins = bins, alpha=0.3, fc='k', edgecolor=None,label='South')
         _ = ax[i].hist(ds.where((ds['sample_heading'] > 45)  & (ds['sample_heading'] < 135))[var[i]].values.flatten(), bins = bins, alpha=0.3, fc='y', edgecolor=None,label='East')
         ax[i].legend(title='SB Direction')
         ax[i].set_title(ds[var[i]].attrs['long_name'])
@@ -35,7 +35,7 @@ def vertical_strength_plots(ds,path):
     for i in range(len(ax)):
         axt = ax[i]
         ax1 = axt.twiny()
-        (ds.isel(time=I[i])['horizontal_speed_corr']).plot(y='depth',ylim=(83,0),alpha=1,c='C0',ax=ax1,label='Horizontal speed')
+        (ds.isel(time=I[i])['horizontal_speed']).plot(y='depth',ylim=(83,0),alpha=1,c='C0',ax=ax1,label='Horizontal speed')
         (ds.isel(time=I[i])['sp_sd_horizontal']/100/np.sqrt(149)).plot(y='depth',ylim=(83,0),alpha=1,c='C0',ls='--',ax=ax1,label='St dev speed')
         ds.isel(time=I[i])['strength'].plot(y='depth',ylim=(83,0),alpha=1,c='C1',ax=axt)
         ax1.axhspan(ds.isel(time=I[i]).depth.where(ds.isel(time=I[i])['strength'] > -40).max()+2,83,0,1,fc='w',alpha=0.75,zorder=4)
@@ -57,9 +57,9 @@ def vertical_strength_plots(ds,path):
     ax1.legend(loc='lower center',framealpha=1)
     plt.savefig(path,dpi=300)
 
-def NE_panels(ds,var,vmin,vmax,cmap,ylim,path,title):
+def NE_panels(ds,var,vmin,vmax,cmap,ylim,path,title,full=True):
     
-    fig, ax = plt.subplots(3,1,figsize=(30,12),constrained_layout=True,sharex=True)
+    fig, ax = plt.subplots(3,1,figsize=(30,15),constrained_layout=True,sharex=True)
     
     for i in range(3):
         
@@ -75,11 +75,19 @@ def NE_panels(ds,var,vmin,vmax,cmap,ylim,path,title):
         ax[i].set_xlabel('')
     
     plt.setp(ax[0].get_xticklabels(),visible=False)
-       
-    ax[1].xaxis.set_minor_locator(mdates.DayLocator())
-    ax[1].xaxis.set_major_locator(mdates.DayLocator([1,5,10,15,20,25]))
-    ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
-    ax[1].xaxis.set_minor_formatter(mdates.DateFormatter(""))
+    if full == True:
+        ax[1].xaxis.set_minor_locator(mdates.DayLocator([15]))
+        ax[1].xaxis.set_major_locator(mdates.MonthLocator())
+        ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
+        ax[1].xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
+    else:
+        ax[1].xaxis.set_minor_locator(mdates.DayLocator())
+        ax[1].xaxis.set_major_locator(mdates.DayLocator([1,5,10,15,20,25]))
+        ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
+        ax[1].xaxis.set_minor_formatter(mdates.DateFormatter(""))
+ 
+        
+        
     plt.xticks(rotation=0,ha='center')
     fig.suptitle(title,fontsize='xx-large',y=1.10)
 
