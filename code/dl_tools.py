@@ -95,7 +95,8 @@ def fix_standard_attrs(ds):
     for i in range(len(old_name)):
         ds[old_name[i]].attrs['standard_name'] = standard_name[i]
         ds[old_name[i]].attrs['long_name'] = long_name[i]
-        ds[old_name[i]].attrs['units'] = units[i]
+        if old_name[i] != 'Time':
+            ds[old_name[i]].attrs['units'] = units[i]
         ds = ds.rename({old_name[i]:standard_name[i]})
         
     return ds

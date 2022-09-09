@@ -569,7 +569,7 @@ def calc_heading_speed(ds):
     
     """
     
-
+    print('Calculating heading and speed of the SB...')
     ds['sample_heading'] = get_bearing2(ds['lat_start'],ds['lat_end'],ds['lon_start'],ds['lon_end'])
 
     dist = np.empty(len(ds['time']), dtype=float)
@@ -584,6 +584,7 @@ def calc_heading_speed(ds):
 
     ds['sample_u'] = ds['sample_vel'] * np.sin(np.deg2rad(ds['sample_heading']))
     ds['sample_v'] = ds['sample_vel'] * np.cos(np.deg2rad(ds['sample_heading']))
+    print('Done!')
 
     return ds
     
@@ -598,10 +599,11 @@ def corr_mag_dec(ds):
     
     """
     
-    
+    print('Correcting for magnetic declination...')
+
     ds['c_u_mag'] = ds['horizontal_speed'] * np.sin(np.deg2rad(ds['direction'] + calc_mag_dec(ds))) / 100
     ds['c_v_mag'] = ds['horizontal_speed'] * np.cos(np.deg2rad(ds['direction'] + calc_mag_dec(ds))) / 100
-    print('Corrected for magnetic declination')
+    print('Done!')
     return ds
 
 def corr_speed(ds):
@@ -614,11 +616,11 @@ def corr_speed(ds):
     
     """
     
-    
+    print('Correcting for GPS movements...')
     ds['c_u_corr'] = ds['c_u_mag'] + ds['sample_u']
     ds['c_v_corr'] = ds['c_v_mag'] + ds['sample_v']
     ds['horizontal_speed'] = (ds['c_u_corr']**2 + ds['c_v_corr']**2)**(1/2)
-    print('Corrected for GPS movements')
+    print('Done!')
 
     return ds
 
@@ -635,7 +637,8 @@ def add_coords(ds):
     
     ds = ds.assign_coords(depth=('cells',np.arange(3,83,2))) # Make sure that we have the correct depth values for the cells. Blanking distance is 3 m.
     ds = ds.assign_coords(latitude=('time', ds['lat_start'].data)).assign_coords(longitude=('time', ds['lon_start'].data))
-    
+    print('Added lat, lon, and depth as coordinates.')
+
     return ds
 
 
@@ -659,6 +662,16 @@ def update_attrs(ds):
             'c_v_mag',
             'c_u_corr',
             'c_v_corr',]
+
+    standard_names = ['sample_heading',
+                      'sample_time',
+                      'sample_vel',
+                      'sample_u',
+                      'sample_v',
+                      'c_u_mag',
+                      'c_v_mag',
+                      'c_u_corr',
+                      'c_v_corr',]
 
     unit = ['degrees',
             '',
@@ -699,7 +712,7 @@ def update_attrs(ds):
         
         c += 1     
     
-    print(f"Updated names, units, and description for {len(keys)} variables")
+    print(f"Updated names, units, and description for {len(keys)} variables.")
  
     return ds
 
