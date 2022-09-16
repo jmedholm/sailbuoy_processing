@@ -336,24 +336,24 @@ def add_attrs(ds):
                       'cell_state2',
                       'horizontal_speed',
                       'direction',
-                      'north_speed',
-                      'east_speed',
-                      'vertical_speed',
+                      'vel_north_raw',
+                      'vel_east_raw',
+                      'vel_up_raw',
                       'sp_sd_horizontal',
                       'strength',
-                      'beam1_speed',
-                      'beam2_speed',
-                      'beam3_speed',
-                      'beam4_speed',
-                      'beam1_strength',
-                      'beam2_strength',
-                      'beam3_strength',
-                      'beam4_strength',
-                      'beam1_sd',
-                      'beam2_sd',
-                      'beam3_sd',
-                      'beam4_sd',
-                      'cross_difference',
+                      'b1_speed',
+                      'b2_speed',
+                      'b3_speed',
+                      'b4_speed',
+                      'b1_strength',
+                      'b2_strength',
+                      'b3_strength',
+                      'b4_strength',
+                      'b1_sd',
+                      'b2_sd',
+                      'b3_sd',
+                      'b4_sd',
+                      'correlation',
                       'lat_start',
                       'lat_end',
                       'lon_start',
@@ -604,6 +604,24 @@ def corr_mag_dec(ds):
     ds['c_u_mag'] = ds['horizontal_speed'] * np.sin(np.deg2rad(ds['direction'] + calc_mag_dec(ds))) / 100
     ds['c_v_mag'] = ds['horizontal_speed'] * np.cos(np.deg2rad(ds['direction'] + calc_mag_dec(ds))) / 100
     print('Done!')
+    return ds
+
+def corr_speed_adcp(ds):
+    
+    """
+    
+    Corrects the currents for GPS movement of the Sailbuoy.
+    
+    Written by Johan Edholm, 2022-09-02 
+    
+    """
+    
+    print('Correcting for GPS movements...')
+    ds['c_u_corr'] = ds['c_u_mag'] + (ds['sample_vel'] * np.sin(np.deg2rad(ds['heading'])))
+    ds['c_v_corr'] = ds['c_v_mag'] + (ds['sample_vel'] * np.cos(np.deg2rad(ds['heading'])))
+    ds['horizontal_speed'] = (ds['c_u_corr']**2 + ds['c_v_corr']**2)**(1/2)
+    print('Done!')
+
     return ds
 
 def corr_speed(ds):

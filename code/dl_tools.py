@@ -228,28 +228,37 @@ def fix_aadi(ds):
     
     Sets attributes for the AADI output, and corrects error values to NaN.
     
-    Written by Johan Edholm 2022-09-08 (https://github.com/jmedholm)  
+    Written by Johan Edholm 2022-09-12 (https://github.com/jmedholm)  
     
     """
     
+    ds['AADI_Salt'] = gsw.SA_from_SP(gsw.SP_from_C(ds['AADI_Cond'],ds['AADI_Temp'],0),ds['longitude'],ds['latitude'],0)
+    
+    
     old_name = ['AADI_Cond',
-                'AADI_Temp']
+                'AADI_Temp',
+               'AADI_Salt']
 
     var_name = ['ssc',
-                'sst']
+                'sst',
+                'sss']
 
     standard_name = ['sea_water_electrical_conductivity',
-                     'sea_water_temperature']
+                     'sea_water_temperature',
+                     'sea_water_absolute_salinity']
 
     units = ['mS cm$^{-1}$',
-             'degrees_c']
+             'degrees_c',
+             'g kg$^{-1}$']
 
     long_name = ['Seawater conductivity',
-                 'Seawater temperature']
+                 'Seawater temperature',
+                 'Seawater salinity']
     
     ds['AADI_Cond'] = ds['AADI_Cond'].where((ds['AADI_Cond'] != -1000000))
     ds['AADI_Temp'] = ds['AADI_Temp'].where((ds['AADI_Temp'] != -237.0))
-
+    ds['AADI_Salt'] = ds['AADI_Salt'].where(ds['AADI_Salt'] > 10)
+    
     for i in range(len(old_name)):
         ds[old_name[i]].attrs['standard_name'] = standard_name[i]
         ds[old_name[i]].attrs['long_name'] = long_name[i]
