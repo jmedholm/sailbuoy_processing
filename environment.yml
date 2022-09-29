@@ -1,4 +1,4 @@
-name: sailbuoy_processing
+name: sbp
 channels:
   - conda-forge
   - defaults

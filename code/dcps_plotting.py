@@ -33,7 +33,7 @@ def vertical_strength_plots(ds,path):
     # Plot some random profiles of speed, std, and strength. Dim everything thats below -40dB strength
     a = 2
     b = 4
-    fig, ax = plt.subplots(a,b,figsize=(30,14),constrained_layout=True,facecolor='w')
+    fig, ax = plt.subplots(a,b,figsize=(30,10),constrained_layout=True,facecolor='w',sharex='col',sharey='row')
     I = np.sort(np.random.randint(len(ds.time),size=a*b))
     ax = ax.flatten()
     for i in range(len(ax)):
@@ -44,21 +44,32 @@ def vertical_strength_plots(ds,path):
         ds.isel(time=I[i])['strength'].plot(y='depth',ylim=(83,0),alpha=1,c='C1',ax=axt)
         ax1.axhspan(ds.isel(time=I[i]).depth.where(ds.isel(time=I[i])['strength'] > -44).max()+2,83,0,1,fc='w',alpha=0.75,zorder=4)
         ax1.axhline(ds.isel(time=I[i]).depth.where(ds.isel(time=I[i])['strength'] > -44).max()+2,c='k',ls='--')
-        ax1.set_xlabel('Speed (m/s)',c='C0',fontweight='bold')
+        ax1.set_xlabel('Speed (m/s)',c='C0',fontweight='bold',labelpad=15)
         axt.set_xlabel('Strength (dB)',c='C1',fontweight='bold')
         ax1.set_title('')
-        axt.set_title(str(I[i]))
+        axt.set_title('')
+        axt.set_title(f"{I[i]}  ",loc='right',y=0.85)
         ax1.set_ylabel('')
-
         ax1.set_xlim(0,1)
-
         axt.xaxis.label.set_color('C1')        #setting up X-axis label color to yellow
         ax1.xaxis.label.set_color('C0')          #setting up Y-axis label color to blue
         axt.tick_params(axis='x', colors='C1')    #setting up X-axis tick color to red
         ax1.tick_params(axis='x', colors='C0')  #setting up Y-axis tick color to black
         ax1.spines['bottom'].set_color('C1')        # setting up Y-axis tick color to red
         ax1.spines['top'].set_color('C0')         #setting up above X-axis tick color to red
+        if i in [0,1,2,3]:
+            axt.set_xlabel('')
+            
+        if i in [4,5,6,7]:
+            ax1.set_xlabel('')
+            plt.setp(ax1.get_xticklabels(), visible=False)
+        if i in [0,4]:
+            axt.set_ylabel('Depth (m)')
+        else:
+            axt.set_ylabel('')
     ax1.legend(loc='lower center',framealpha=1)
+    
+    
     plt.savefig(path,dpi=300)
 
 def NE_panels(ds,var,vmin,vmax,cmap,ylim,path,title,full=True):
@@ -300,10 +311,10 @@ def distance_plot(ds_across,i,bathy,xlims,ylims,path,name,title):
     cax1 = fig.add_subplot(gs[2:4, 29])
     cax2 = fig.add_subplot(gs[4:, 29])
     
-    ds_across[i]['sst'].sortby('distance').plot(x='distance',ax=axt,c='C1')
-    ds_across[i]['sss'].sortby('distance').plot(x='distance',ax=axs,c='C0')
-    ds_across[i]['vel_north'].sortby('distance').plot(x='distance',y='depth',ylim=(59,0),vmin=-0.75,vmax=0.75,ax=ax1,cmap='cmo.balance',cbar_kwargs={'pad':0.01,'label':'North speed (m s$^{-1}$)','cax':cax1})
-    ds_across[i]['vel_east'].sortby('distance').plot(x='distance',y='depth',ylim=(59,0),vmin=-0.75,vmax=0.75,ax=ax2,cmap='cmo.balance',cbar_kwargs={'pad':0.01,'label':'East speed (m s$^{-1}$)','cax':cax2})
+    ds_across[i]['sst'].plot(x='distance',ax=axt,c='C1')
+    ds_across[i]['sss'].plot(x='distance',ax=axs,c='C0')
+    ds_across[i]['vel_north'].plot(y='depth',ylim=(59,0),vmin=-0.75,vmax=0.75,ax=ax1,cmap='cmo.balance',cbar_kwargs={'pad':0.01,'label':'North speed (m s$^{-1}$)','cax':cax1})
+    ds_across[i]['vel_east'].plot(y='depth',ylim=(59,0),vmin=-0.75,vmax=0.75,ax=ax2,cmap='cmo.balance',cbar_kwargs={'pad':0.01,'label':'East speed (m s$^{-1}$)','cax':cax2})
     plt.setp(ax1.get_xticklabels(),visible=False)
     plt.setp(axt.get_xticklabels(),visible=False)
     axt.set_xlabel('')
@@ -341,51 +352,52 @@ def distance_plot(ds_across,i,bathy,xlims,ylims,path,name,title):
     ax3.set_title(dur)
     plt.savefig(f"{path}/across-slope/gridded_distance/across_{(i+1):02d}_{name}.png")
     
-def full_plots(ds,path,name,vlim=0.0005,hlim=0.1):
+def full_plots(ds,path,name,vlim=0.1,hlim=0.0005):
     
     for j in range(len(ds)):
-            fig, ax = plt.subplots(7,1,figsize=(30,21),sharex=True,constrained_layout=True)
+        
+        fig, ax = plt.subplots(8,1,figsize=(30,21),sharex=True,constrained_layout=True)
 
-            var = ['wind_speed','air_temp','sst','vel_north','vel_east','vert_shear','hor_shear']
-            ylims = [[0,20],[-5,5],[-1,1],[60,0],[60,0],[60,0],[60,0]]
-            clims = [[],[],[],[-0.75,0.75],[-0.75,0.75],[0,hlim],[0,vlim]]
-            cmaps = [[],[],[],cmo.balance,cmo.balance,cmo.tempo,cmo.tempo]
-            cbar_fmt = ['','','','%.2f','%.2f','%.3f','%.4f']
-            for i, axs in enumerate(ax):
-                if i < 3:
-                    props = {'ylim':ylims[i], 'lw':3, 'color':'C1'}
-                    ds[j][var[i]].sortby('distance').plot(x='distance',xlim=(150,-150),ax=axs,**props)
-                    axs.set_ylabel(f"({ds[j][var[i]].attrs['units']})",c=['k','k','C1'][i])
+        var = ['wind_speed','air_temp','sst','vel_north','vel_east','vert_shear','hor_shear','hor_shear2']
+        ylims = [[0,20],[-5,5],[-1,1],[50,0],[50,0],[50,0],[50,0],[50,0]]
+        clims = [[],[],[],[-0.75,0.75],[-0.75,0.75],[0,vlim],[0,hlim],[0,hlim]]
+        cmaps = [[],[],[],cmo.balance,cmo.balance,cmo.tempo,cmo.tempo,cmo.tempo]
+        cbar_fmt = ['','','','%.2f','%.2f','%.3f','%.5f','%.5f']
+        for i, axs in enumerate(ax):
+            if i < 3:
+                props = {'ylim':ylims[i], 'lw':3, 'color':'C1'}
+                ds[j][var[i]].sortby('distance').plot(x='distance',xlim=(150,-150),ax=axs,**props)
+                axs.set_ylabel(f"({ds[j][var[i]].attrs['units']})",c=['k','k','C1'][i])
 
-                else:
-                    props = {'ylim':ylims[i], 'vmin':clims[i][0], 'vmax':clims[i][1], 'cmap':cmaps[i]}
-                    cbar_kwargs={'label':f"({ds[j][var[i]].attrs['units']})",'pad':-0.035,'format':cbar_fmt[i],'aspect':10}
-                    ds[j][var[i]].sortby('distance').plot(y='depth',x='distance',xlim=(150,-150),ax=axs,cbar_kwargs=cbar_kwargs,**props)
-                    axs.set_ylabel(f"Depth (m)")
+            else:
+                props = {'ylim':ylims[i], 'vmin':clims[i][0], 'vmax':clims[i][1], 'cmap':cmaps[i]}
+                cbar_kwargs={'label':f"({ds[j][var[i]].attrs['units']})",'pad':-0.035,'format':cbar_fmt[i],'aspect':10}
+                ds[j][var[i]].sortby('distance').plot(y='depth',x='distance',xlim=(150,-150),ax=axs,cbar_kwargs=cbar_kwargs,**props)
+                axs.set_ylabel(f"Depth (m)")
 
-                axs.set_xlabel('')
+            axs.set_xlabel('')
 
-                if i == 2:
-                    axs.set_title(f"({['a','b','c','d','e','f','g'][i]}) {ds[j][var[i]].attrs['long_name']} and salinity",loc='left',y=.05,x=0.01)
-                else:
-                    axs.set_title(f"({['a','b','c','d','e','f','g'][i]}) {ds[j][var[i]].attrs['long_name']}",loc='left',y=.05,x=0.01)
-                if i == 0:
-                    axs.set_title(f"({['a','b','c','d','e','f','g'][i]}) {ds[j][var[i]].attrs['long_name']} and gusts",loc='left',y=.05,x=0.01)
+            if i == 2:
+                axs.set_title(f"({['a','b','c','d','e','f','g','h'][i]}) {ds[j][var[i]].attrs['long_name']} and salinity",loc='left',y=.05,x=0.01)
+            else:
+                axs.set_title(f"({['a','b','c','d','e','f','g','h'][i]}) {ds[j][var[i]].attrs['long_name']}",loc='left',y=.05,x=0.01)
+            if i == 0:
+                axs.set_title(f"({['a','b','c','d','e','f','g','h'][i]}) {ds[j][var[i]].attrs['long_name']} and gusts",loc='left',y=.05,x=0.01)
 
-            ax_s = ax[2].twinx()
-            ds[j]['sss'].sortby('distance').plot(x='distance',xlim=(150,-150),ax=ax_s,c='C0',lw=3)
-            ax_s.set_ylabel(f"({ds[j]['sss'].attrs['units']})",c='C0')
+        ax_s = ax[2].twinx()
+        ds[j]['sss'].sortby('distance').plot(x='distance',xlim=(150,-150),ax=ax_s,c='C0',lw=3)
+        ax_s.set_ylabel(f"({ds[j]['sss'].attrs['units']})",c='C0')
 
-            for i in range(2):
-                [ax[2],ax_s][i].tick_params(axis='y', color=['C1','C0'][i], labelcolor=['C1','C0'][i])
-                ax_s.spines[['left','right'][i]].set_edgecolor(['C1','C0'][i])
-                ax_s.spines[['left','right'][i]].set_linewidth(2)
+        for i in range(2):
+            [ax[2],ax_s][i].tick_params(axis='y', color=['C1','C0'][i], labelcolor=['C1','C0'][i])
+            ax_s.spines[['left','right'][i]].set_edgecolor(['C1','C0'][i])
+            ax_s.spines[['left','right'][i]].set_linewidth(2)
 
-            a_b = gsw.alpha_on_beta(ds[j]['sss'].mean('time'),ds[j]['sst'].mean('time'),0).values
-            ax_s.set_ylim(33.3,34.2)
-            ax[2].set_ylim(-2,-2+(1/a_b)*0.9)
-            ax[0].fill_between(ds[j]['distance'],ds[j]['wind_speed'],ds[j]['wind_gust'],fc='C1',ec=None,alpha=0.25)
+        a_b = gsw.alpha_on_beta(ds[j]['sss'].mean('time'),ds[j]['sst'].mean('time'),0).values
+        ax_s.set_ylim(33.3,34.2)
+        ax[2].set_ylim(-2,-2+(1/a_b)*0.9)
+        ax[0].fill_between(ds[j]['distance'],ds[j]['wind_speed'],ds[j]['wind_gust'],fc='C1',ec=None,alpha=0.25)
 
-            axs.set_xlabel('Distance (km)')
-            fig.suptitle(f"Across-slope {[1,2,3,4,5,6,7,8,9,10,11,12,15,16][j]}",fontsize='xx-large')
-            plt.savefig(f"{path}/across-slope/panels_across_{[1,2,3,4,5,6,7,8,9,10,11,12,15,16][j]:02d}_{name}.png")
+        axs.set_xlabel('Distance (km)')
+        fig.suptitle(f"Across-slope {[1,2,3,4,5,6,7,8,9,10,11,12,15,16][j]}",fontsize='xx-large')
+        plt.savefig(f"{path}/across-slope/panels_across_{[1,2,3,4,5,6,7,8,9,10,11,12,15,16][j]:02d}_{name}.png")
