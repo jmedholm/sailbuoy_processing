@@ -192,7 +192,7 @@ def drop_bad_vars(ds):
     
     """
     
-    Takes the dataset, and drop all the variables starting with a '*'. I believe this to be untrustworthy data, must check with Aanderaa.
+    Takes the dataset, and drop all the variables starting with a '*'. This data is of reduced quality according to Aanderaa.
     
     Written by Johan Edholm, 2022-09-02 
     
@@ -600,9 +600,9 @@ def corr_mag_dec(ds):
     """
     
     print('Correcting for magnetic declination...')
-
-    ds['c_u_mag'] = ds['horizontal_speed'] * np.sin(np.deg2rad(ds['direction'] + calc_mag_dec(ds))) / 100
-    ds['c_v_mag'] = ds['horizontal_speed'] * np.cos(np.deg2rad(ds['direction'] + calc_mag_dec(ds))) / 100
+    ds['mag_dec'] = (('time'), (calc_mag_dec(ds)))
+    ds['c_u_mag'] = ds['horizontal_speed'] * np.sin(np.deg2rad(ds['direction'] + ds['mag_dec'])) / 100
+    ds['c_v_mag'] = ds['horizontal_speed'] * np.cos(np.deg2rad(ds['direction'] + ds['mag_dec'])) / 100
     print('Done!')
     return ds
 

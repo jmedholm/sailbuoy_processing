@@ -187,7 +187,7 @@ def fix_dcps(ds):
                 'dcps_dir']
 
     standard_name = ['dcps_flags',
-                     'wind_from_direction',
+                     'dcps_time',
                      'sea_water_velocity',
                      'sea_water_velocity_to_direction']
 
