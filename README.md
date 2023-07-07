@@ -1,8 +1,8 @@
-# Sailbuoy SO-CHIC
-Sailbuoy processing for the SO-CHIC mission
+# Sailbuoy
+Sailbuoy processing
 [![DOI](https://zenodo.org/badge/534208314.svg)](https://zenodo.org/badge/latestdoi/534208314)
 
-These sets of notebooks deals with the ADCP sensor on the Sailbuoy, and process the data, and combines it with the output from the other sensors.
+These sets of notebooks deals with the ADCP sensor on the Sailbuoy, process the data, and combine it with the output from the other sensors.
 
 Different outputs:
 1. Datalogger - Compiled output from all sensors
