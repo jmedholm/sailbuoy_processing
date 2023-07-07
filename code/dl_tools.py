@@ -9,7 +9,7 @@ Module to load and work with SailBuoy data.
 """
 
 
-def load_data(path):
+def load_sb(path):
     
     """
     
@@ -272,6 +272,154 @@ def fix_aadi(ds):
         ds[old_name[i]].attrs['vendor_name'] = 'Aanderaa'
         ds[old_name[i]].attrs['model_name'] = 'Conductivity sensor 4319'
         ds[old_name[i]].attrs['model_product_page'] = 'https://www.aanderaa.com/media/pdfs/d369_aanderaa_conductivity_sensor_4319.pdf' 
+        ds = ds.rename({old_name[i]:var_name[i]})
+    
+    return ds
+
+def fix_FT(ds):
+    
+    """
+    
+    Sets attributes for the FT742 output, and corrects error values to NaN.
+    
+    Written by Johan Edholm 2023-05-08 (https://github.com/jmedholm)  
+    
+    """    
+    
+    old_name = ['FT_Temp',
+                'FT_WindDir',
+                'FT_WindSpeed',
+                'FT_WindGust',
+                'FT_Dir']
+
+    var_name = ['air_temp',
+                'wind_dir',
+                'wind_speed',
+                'wind_gust',
+                'heading']
+
+    standard_name = ['air_temperature',
+                     'wind_from_direction',
+                     'wind_speed',
+                     'wind_speed_of_gust',
+                     'heading']
+
+    units = ['degrees_c',
+             'degree',
+             'm s$^{-1}$',
+             'm s$^{-1}$',
+             'degree']
+
+    long_name = ['Air temperature',
+                 'Wind from',
+                 'Wind speed',
+                 'Wind gust speed',
+                 'Heading from sensor´s internal compass']
+    
+    for i in range(len(old_name)):
+        ds[old_name[i]].attrs['standard_name'] = standard_name[i]
+        ds[old_name[i]].attrs['long_name'] = long_name[i]
+        ds[old_name[i]].attrs['units'] = units[i]
+        ds[old_name[i]].attrs['installed_date'] = '??'
+        ds[old_name[i]].attrs['device_name'] = 'FT742 Surface Mount'
+        ds[old_name[i]].attrs['serial_number'] = '??'
+        ds[old_name[i]].attrs['last_calibrated'] = '??'
+        ds[old_name[i]].attrs['installed_height'] = '0.3'
+        ds[old_name[i]].attrs['firmware'] = '??'
+        ds[old_name[i]].attrs['vendor_name'] = 'FT Technologies'
+        ds[old_name[i]].attrs['model_name'] = 'FT742'
+        ds[old_name[i]].attrs['model_product_page'] = 'https://fttechnologies.com/support/installation/surface-mount-sm/' 
+        if old_name[i] == 'FT_Temp':
+            ds[old_name[i]].attrs['note'] = 'The temperature is not to be trusted fully.'
+            
+        ds = ds.rename({old_name[i]:var_name[i]})
+    return ds
+
+def fix_legato(ds):
+    
+    """
+    
+    Sets attributes for the RBR Legato output, and corrects error values to NaN.
+    
+    Written by Johan Edholm 2023-05-08 (https://github.com/jmedholm)  
+    
+    """    
+    
+    old_name = ['RBRL_C',
+                'RBRL_T',
+                'RBRL_Sal']
+
+    var_name = ['ssc',
+                'sst',
+                'sss']
+
+    standard_name = ['sea_water_electrical_conductivity',
+                     'sea_water_temperature',
+                     'sea_water_practical_salinity']
+
+    units = ['mS cm$^{-1}$',
+             'degrees_c',
+             'PSU']
+
+    long_name = ['Seawater conductivity',
+                 'Seawater temperature',
+                 'Seawater salinity']
+        
+    for i in range(len(old_name)):
+        ds[old_name[i]].attrs['standard_name'] = standard_name[i]
+        ds[old_name[i]].attrs['long_name'] = long_name[i]
+        ds[old_name[i]].attrs['units'] = units[i]
+        ds[old_name[i]].attrs['installed_date'] = '??'
+        ds[old_name[i]].attrs['device_name'] = 'RBR Legato'
+        ds[old_name[i]].attrs['serial_number'] = '??'
+        ds[old_name[i]].attrs['last_calibrated'] = '??'
+        ds[old_name[i]].attrs['installed_height'] = '-0.2'
+        ds[old_name[i]].attrs['firmware'] = '??'
+        ds[old_name[i]].attrs['vendor_name'] = 'RBR'
+        ds[old_name[i]].attrs['model_name'] = 'Legato'
+        ds[old_name[i]].attrs['model_product_page'] = 'https://rbr-global.com/products/ctd_gliders_auvs/rbrlegato/' 
+        ds = ds.rename({old_name[i]:var_name[i]})
+    
+    return ds
+
+def fix_T9602(ds):
+    
+    """
+    
+    Sets attributes for the Telaire T9602 output, and corrects error values to NaN.
+    
+    Written by Johan Edholm 2023-06-08 (https://github.com/jmedholm)  
+    
+    """    
+    
+    old_name = ['T9602_T',
+                'T9602_H']
+
+    var_name = ['air_t',
+                'rh']
+
+    standard_name = ['air_temperature',
+                     'relative_humidity']
+
+    units = ['degrees_c',
+             'percent']
+
+    long_name = ['Air temperature',
+                 'Relative humidity']
+        
+    for i in range(len(old_name)):
+        ds[old_name[i]].attrs['standard_name'] = standard_name[i]
+        ds[old_name[i]].attrs['long_name'] = long_name[i]
+        ds[old_name[i]].attrs['units'] = units[i]
+        ds[old_name[i]].attrs['installed_date'] = '??'
+        ds[old_name[i]].attrs['device_name'] = 'Telaire 9602'
+        ds[old_name[i]].attrs['serial_number'] = '??'
+        ds[old_name[i]].attrs['last_calibrated'] = '??'
+        ds[old_name[i]].attrs['installed_height'] = '1'
+        ds[old_name[i]].attrs['firmware'] = '??'
+        ds[old_name[i]].attrs['vendor_name'] = 'Telaire'
+        ds[old_name[i]].attrs['model_name'] = 'T9602 Humidity & Temperature Probe'
+        ds[old_name[i]].attrs['model_product_page'] = 'https://www.amphenol-sensors.com/en/telaire/humidity/527-humidity-sensors/3224-t9602' 
         ds = ds.rename({old_name[i]:var_name[i]})
     
     return ds
